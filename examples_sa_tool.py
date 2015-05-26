@@ -2,10 +2,6 @@ import sa_tool
 import networkx as nx
 
 if __name__ == '__main__' :
-    if(nx.__version__ != '2.0.dev_20150521003926'):
-        print "networkx library error"
-        print "ERROR : max match algorithm is implemented in the 2.0 dev branch. Please install 2.0 dev branch of networkx"
-        exit()
 
     B = nx.Graph(name="Example 5.17")
     B.add_nodes_from(['x1', 'x2', 'x3', 'x4', 'x5'], bipartite=0, color='r') # Add the node attribute "bipartite"

@@ -24,8 +24,13 @@ class SATool:
             self.variables = X
 
     def calculate_maximum_matching(self):
-        self.max_match_dict = nx.algorithms.bipartite.maximum_matching(self.G)
-        self.max_match_list = list(self.max_match_dict.items())
+        try:
+            self.max_match_dict = nx.algorithms.bipartite.maximum_matching(self.G)
+            self.max_match_list = list(self.max_match_dict.items())
+        except:
+            print "Networkx Development version required for calculationg maximum matching"
+            print "Please read Installation instructions "
+            exit()
 
     def calculate_orientation(self):
         '''

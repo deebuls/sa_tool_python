@@ -2,13 +2,25 @@ SaTool-python:
 =======
 # Structural Analysis Tool 
 
-This paper introduces SaTool-python, an open-source implementation of the
+SaTool-python is an open-source implementation of the
 tool, for doing structural analysis.
-”SATOOL - A Software Tool for structural analysis of complex automa-
-tion systems ”[1] , introduces a tool for structural analysis, the use of the
-Matlab -based 3 implementation is presented and special features are intro-
+The implementation is inspired on the SATOOL developed by Blanke et. all.
+”SATOOL - A Software Tool for structural analysis of complex automation systems ”[1] ,
+ introduces a tool for structural analysis, the use of the
+Matlab - based 3 implementation is presented and special features are intro-
 duced, which were motivated by industrial users.
 
+# Installation
+
+The code requires networkx development version ( for implementation of
+bipartite maximal algorithm).
+Networkx development can be installed by follwoing command
+```bash
+pip install git://github.com/networkx/networkx.git#egg=networkx
+```
+
+Please refer [Networkx Development
+installation]{http://networkx.github.io/documentation/development/install.html}
 # Code Example
 ### Creating the Bipartite Graph from the incidence matrix
 ```python

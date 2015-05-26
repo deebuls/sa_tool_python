@@ -48,6 +48,7 @@ installation]{http://networkx.github.io/documentation/development/install.html}
     sa1.visualize_bipartite()
     
 ```
+![bipartite](images/Example 5.17.png)
 ### Calculating the Maximum Matching
 ```python
     sa1.calculate_maximum_matching()
@@ -58,6 +59,7 @@ installation]{http://networkx.github.io/documentation/development/install.html}
     sa1.visualize_bipartite(with_matching=True)
     
 ```
+![bipartite](images/Example 5.17MaxMatching.png)
 ### Calculating the Orientation
 ```python
     sa1.calculate_orientation()
@@ -69,6 +71,7 @@ installation]{http://networkx.github.io/documentation/development/install.html}
     
 ```
 
+![bipartite](images/Example 5.17WithOrientation.png)
 [1] Denmark, K. (2006). Satool-a software tool for structural analysis of complex
 auomation systems.
 

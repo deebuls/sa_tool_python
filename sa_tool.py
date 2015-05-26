@@ -89,14 +89,14 @@ class SATool:
         nx.draw_networkx_labels(self.G,pos)
 
         fig.suptitle(self.G.name, fontsize=14, fontweight='bold')
-        plt.savefig("./images/" + self.G.name + ".png")
+        #plt.savefig("./images/" + self.G.name + ".png")
         if(with_matching ):
             ax1.set_title("Max Matching")
             self.calculate_maximum_matching()
             nx.draw_networkx_edges(self.G,pos,ax=ax1,
                                 edgelist=self.max_match_list,
                                 width=8,alpha=0.3,edge_color='b')
-            plt.savefig("./images/" + self.G.name+"_MaxMatching" + ".png")
+            #plt.savefig("./images/" + self.G.name+"_MaxMatching" + ".png")
         if(with_orientation):
             ax1.set_title("With Orientation")
             self.calculate_maximum_matching()
@@ -114,7 +114,7 @@ class SATool:
             nx.draw_networkx_edges(self.D,pos,ax=ax1,
                        edgelist=self.orientation_graph, arrows=True,
                        width=1,alpha=0.5)
-            plt.savefig("./images/" + self.G.name+"_WithOrientation" + ".png")
+            #plt.savefig("./images/" + self.G.name+"_WithOrientation" + ".png")
         '''
         red_patch = mpatches.Patch(color='red', label='Unmatched Constraint')
         yellow_patch = mpatches.Patch(color='yellow', label='Variables')

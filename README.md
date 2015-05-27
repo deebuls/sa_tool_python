@@ -20,12 +20,10 @@ pip install git://github.com/networkx/networkx.git#egg=networkx
 ```
 ## Installation  from github
 * Clone the networkx repostitory
-```
-git clone https://github.com/networkx/networkx.git
-```
-    (see https://github.com/networkx/networkx/ for other options)
-* Change directory to networkx
-* Run python setup.py install to build and install
+    git clone https://github.com/networkx/networkx.git
+(see https://github.com/networkx/networkx/ for other options)
+* Change directory to **networkx**
+* Run **python setup.py install** to build and install
 
 Please refer [Networkx Development
 installation]{http://networkx.github.io/documentation/development/install.html}

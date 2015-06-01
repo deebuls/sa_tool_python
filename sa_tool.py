@@ -2,6 +2,8 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import sys
+import pulp
+import string
 class SATool:
     """"
     Class for doing structural analysis using graphs.
@@ -14,23 +16,113 @@ class SATool:
             print "[ERROR]Not a bipartite graph provided."
             sys.exit()
 
+        #Copying the graph provided by the user
         self.G = graph
+        
+        #Creating a Directed graph with all bidirectional edges
         self.D = graph.to_directed()
+
+        #Separating the variables and constraints
         self.variables, self.constraints = nx.bipartite.sets(self.G)
+
+        #Ensuring that the bipartite == 1 is assigned to varaibles
         Y = list(self.variables)
         if (self.G.node[Y[0]]['bipartite'] == 1):
             X = self.constraints
             self.constraints = self.variables
             self.variables = X
 
+        #Separating the known and the unknown variables
+        try:
+            known = []
+            unknown = []
+            for n in self.variables:
+                if (self.G.node[n]['type'] == 'known'):
+                    known.append(n)
+                elif (self.G.node[n]['type'] == 'unknown'):
+                    unknown.append(n)
+                else:
+                    print "[ERROR] Please specify for each node type as 'known' or 'unknown'"
+                    sys.exit()
+
+            self.known = set(known)
+            self.unknown = set(unknown)
+        except KeyError:
+                print "[ERROR] Please specify for each node type as 'known' or 'unknown'"
+                sys.exit()
+
+        #Creating reduced graph by removing known variables
+        self.R = self.G.copy()
+        self.R.remove_nodes_from(self.known)
+
+        #Removing edges which cannot be matched
+        #Example with derivative casuality
+        for x,y in  self.G.edges():
+            if 'derivative_casuality' in self.G[x][y] :
+                self.R.remove_edge(x,y)
+
+
     def calculate_maximum_matching(self):
         try:
-            self.max_match_dict = nx.algorithms.bipartite.maximum_matching(self.G)
+            self.max_match_dict = nx.algorithms.bipartite.maximum_matching(self.R)
             self.max_match_list = list(self.max_match_dict.items())
+            print self.max_match_list
         except:
             print "Networkx Development version required for calculationg maximum matching"
             print "Please read Installation instructions "
             exit()
+
+    def calculate_maximum_matching_max_flow_algorithm(self):
+        '''
+        Using Max flow algorithm to determine the maximum matching in bipartite graph.
+        We need to convert the Bi partite graph to a network as following .
+        Steps:
+            1. All edges should go from variables to constraints
+            2. Add a source node S
+            3. Source node should have edge from it to all the variables
+            4. Add a sink node
+            5. Sink node should have edges from all the constraints to the sink node
+            6. 
+        '''
+        prob = pulp.LpProblem("maximal_matching", pulp.LpMaximize)
+       
+        # Variables
+        var = {}
+        for x,y in  self.R.edges():
+            var[x+y]=pulp.LpVariable(x+".__."+y , 0, 1, pulp.LpInteger)
+    
+        # Objective
+        prob += pulp.lpSum([var[i] for i in var])
+
+        # Constraints
+        for n in self.R.nodes_iter():
+            if len(self.R.neighbors(n)) > 1 :
+                keys = []
+                for x in self.R.neighbors(n):
+                    if var.has_key(n+x): 
+                        print n , " neighbor :", x
+                        keys.append(n+x) 
+                    print keys
+                
+                if(len(keys)):
+                    prob += pulp.lpSum([var[i] for i in keys]) <= 1
+
+        print prob
+        # Finding multiple Solutions for maximal flow
+        while True:
+
+            prob.solve()
+            print "Status : ", pulp.LpStatus[prob.status]
+            if pulp.LpStatus[prob.status] == "Optimal":
+                match = ([(string.split(v.name, sep='.__.' ))for v in prob.variables() if v.varValue == 1])
+                
+                print match
+
+                # Adding this so that the same solution doesnt come up again
+                prob += pulp.lpSum([v for v in prob.variables() if v.varValue == 1]) == 1
+            else:
+                break
+
 
     def calculate_orientation(self):
         '''
@@ -80,7 +172,12 @@ class SATool:
         fig, ax1 = plt.subplots(nrows=1, ncols=1, figsize=(8,8))
         # nodes
         nx.draw_networkx_nodes(self.G,pos,ax=ax1,
-                            nodelist=self.variables,
+                            nodelist=self.known,
+                            node_color='m',
+                            node_size=500,
+                            alpha=0.8)
+        nx.draw_networkx_nodes(self.G,pos,ax=ax1,
+                            nodelist=self.unknown,
                             node_color='g',
                             node_size=500,
                             alpha=0.8)

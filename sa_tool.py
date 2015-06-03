@@ -123,6 +123,70 @@ class SATool:
             else:
                 break
 
+    def test_for_obseravable_monitorable(self):
+        '''
+        Blamke Pg : 163
+        "As all constraints are ranked, the system is fully obserable and monitorable."
+        Steps for finding monitorability :
+            1 Ranking of constratints
+                Algo 5.3 Pg 142
+            2 Based on result coment on the monitorability 
+        '''
+
+    def list_all_analytic_redundancy_relations(self):
+        '''
+        Blanke Pg : 162
+        "Redundancy relations are composed of alternated chains, which start 
+        with known variables and which end with non-matched constratints whose
+        output is ZERO"
+
+        Steps :
+            1 Start with the oriented graph 
+            2 Find path from Known variable to non matched contratins
+
+        TODO:
+        Open question : 
+        1. There are 2 known variable ? so from which to take the path
+        2. There are 2 constraints ? I think we have to consider all the constraint
+        3. There are multiple path ? so which path
+        '''
+        print "Known Variables :",self.known
+        print "Unmatched contratins :",self.unmatched_constraints
+
+        for v in self.known:
+            for c in self.unmatched_constraints:
+                paths =  nx.all_simple_paths(self.D_with_orientation, v, c )
+                print(list(paths))
+
+    def list_all_detectable_constratints(self):
+        '''
+        Blanke Pg 164
+        Defn : Structural Detectablitiy
+            A violation of constraint c is structurally detectable if and only
+            if it has a non-zero Boolean signature in some residual r
+
+        Steps:
+            1 Find all the analytic redundant relations
+            2 Create a matrix of relation to constraints. constraint flag set 
+            to true if constraint flag appears in the relations
+            3 return all the constraints for whom there is atleast 1 boolean flag
+            set
+        '''
+
+    def list_all_isolable_constratints(self):
+        '''
+        Blanke Page 164
+        Defn : Structural Isolability
+            
+        Steps :
+            1 Find all the analytic redundant relations
+            2 Create a matrix of relation to constraints. constraint flag set 
+            to true if constraint flag appears in the relations
+            3 Return those constraints which for a particular relation is the 
+                only flag . i.e. no other constraint has boolean set for the particular
+                relation except this constraint
+        '''
+
 
     def calculate_orientation(self):
         '''
@@ -149,20 +213,28 @@ class SATool:
         #Finding unmatched constratints
         self.unmatched_constraints =  self.constraints - set(self.max_match_dict.keys())
 
-        self.orientation_graph = []
+        self.orientation_graph_edge_list = []
 
         for e in self.max_match_list:
             #check if the edge starts from a constraint node
             if (self.D.node[e[0]]['bipartite'] == 1):
-                self.orientation_graph.append(e)
+                self.orientation_graph_edge_list.append(e)
                 for s in self.D.successors(e[0]):
                     if (s != e[1]):
-                        self.orientation_graph.append((s,e[0]))
+                        self.orientation_graph_edge_list.append((s,e[0]))
                         
         #for non matched constraints
         for constraint in self.unmatched_constraints:
             for variable in self.D.successors(constraint):
-                self.orientation_graph.append((variable,constraint))
+                self.orientation_graph_edge_list.append((variable,constraint))
+
+        ## TODO
+        ## creating Graph with orintation 
+        ## including both known and unknown variables
+        ## can be removed to just use  the D graph 
+        ## need to modify the D graph with the orientation obtained
+        self.D_with_orientation = nx.DiGraph(self.orientation_graph_edge_list)
+
 
     def visualize_bipartite(self, with_matching=False,with_orientation=False):
         pos = dict()
@@ -213,8 +285,9 @@ class SATool:
                                 node_color='r',
                                 node_size=500,
                                 alpha=0.8)
-            nx.draw_networkx_edges(self.D,pos,ax=ax1,
-                       edgelist=self.orientation_graph, arrows=True,
+            nx.draw_networkx_edges(self.D_with_orientation,pos,ax=ax1,
+                       #edgelist=self.orientation_graph_edge_list, arrows=True,
+                       arrows=True,
                        width=1,alpha=0.5)
             #plt.savefig("./images/" + self.G.name+"_WithOrientation" + ".png")
         '''

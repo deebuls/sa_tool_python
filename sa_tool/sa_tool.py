@@ -4,6 +4,8 @@ import matplotlib.patches as mpatches
 import sys
 import pulp
 import string
+
+from collections import defaultdict
 class SATool:
     """"
     Class for doing structural analysis using graphs.
@@ -61,6 +63,64 @@ class SATool:
             if 'derivative_casuality' in self.G[x][y] :
                 self.R.remove_edge(x,y)
 
+    def calculate_matching_ranking_constraints(self):
+        '''
+        Calculating the maximum matching based in the ranking.
+        Ranking is take as the degree of the nodes(constraints)
+        The algorithm is based on the Ranking algorithm from book
+        "Fault Diagnosis and Fault-tolerant Control " Chapter 5.
+
+        "The idea is to start with constraint with smallest number of edges
+        with variables and to propagate step by step by matching constraint 
+        and unmatched variable step "
+
+        Pre requisitive:
+            All the unkown variables are considered as unmatched variables
+            Reduced Graph is used.
+        Algorithm :
+            1. Find the degree of all the nodes(constraints) -> Degree is the number of edges the nodes have.
+            2. Loop on the nodes starting from node with smallest degree
+            3. For each node(constraint) -> Find the neighbors(variables)
+            4. for each neighbor -> check if the neighbor(variable) is in the matched variable list
+                if present then 
+                    add the (constraint-variable) pair to the matching list
+                    remove the variable from the unmatched constraint list
+                    break since the constraint is matched
+
+        Output :
+            Maximum matching
+
+        Assumptions :
+            
+        '''
+        unmarked_variables = self.variables.copy()
+        max_matching = []
+    
+        degree_of_constraints = self.R.degree(self.constraints)
+
+        # Swapping the key with value of dict degree_of_constraints
+        # value (degree ) is not unique
+        ddict = defaultdict(list)
+
+        for k, v in degree_of_constraints.items():
+            ddict[v].append(k)
+
+        for deg in ddict:
+            for constraint in ddict[deg]:
+                # For each constraint find the edge to the corresponding 
+                # variable. Add the edge to the max matching if the variable
+                # is not matched
+                variables = self.R.neighbors(constraint)
+                for variable in variables:
+                    if (variable in unmarked_variables):
+                        max_matching.append((constraint,variable))
+                        unmarked_variables.remove(variable)
+                        break
+
+
+        self.max_match_dict = dict(max_matching)
+        self.max_match_list = max_matching
+        print "Max Matching : ",max_matching
 
     def calculate_maximum_matching(self):
         try:
@@ -72,56 +132,6 @@ class SATool:
             print "Please read Installation instructions "
             exit()
 
-    def calculate_maximum_matching_max_flow_algorithm(self):
-        '''
-        Using Max flow algorithm to determine the maximum matching in bipartite graph.
-        We need to convert the Bi partite graph to a network as following .
-        Steps:
-            1. All edges should go from variables to constraints
-            2. Add a source node S
-            3. Source node should have edge from it to all the variables
-            4. Add a sink node
-            5. Sink node should have edges from all the constraints to the sink node
-            6. 
-        '''
-        prob = pulp.LpProblem("maximal_matching", pulp.LpMaximize)
-       
-        # Variables
-        var = {}
-        for x,y in  self.R.edges():
-            var[x+y]=pulp.LpVariable(x+".__."+y , 0, 1, pulp.LpInteger)
-    
-        # Objective
-        prob += pulp.lpSum([var[i] for i in var])
-
-        # Constraints
-        for n in self.R.nodes_iter():
-            if len(self.R.neighbors(n)) > 1 :
-                keys = []
-                for x in self.R.neighbors(n):
-                    if var.has_key(n+x): 
-                        print n , " neighbor :", x
-                        keys.append(n+x) 
-                    print keys
-                
-                if(len(keys)):
-                    prob += pulp.lpSum([var[i] for i in keys]) <= 1
-
-        print prob
-        # Finding multiple Solutions for maximal flow
-        while True:
-
-            prob.solve()
-            print "Status : ", pulp.LpStatus[prob.status]
-            if pulp.LpStatus[prob.status] == "Optimal":
-                match = ([(string.split(v.name, sep='.__.' ))for v in prob.variables() if v.varValue == 1])
-                
-                print match
-
-                # Adding this so that the same solution doesnt come up again
-                prob += pulp.lpSum([v for v in prob.variables() if v.varValue == 1]) == 1
-            else:
-                break
 
 
     def calculate_orientation(self):
@@ -145,7 +155,8 @@ class SATool:
                 find connected nodes of the constraint node
                 add edge from connected node to the constraint node
         '''
-        self.calculate_maximum_matching()
+        #self.calculate_maximum_matching()
+        self.calculate_matching_ranking_constraints()
         #Finding unmatched constratints
         self.unmatched_constraints =  self.constraints - set(self.max_match_dict.keys())
 
@@ -158,7 +169,6 @@ class SATool:
                 for s in self.D.successors(e[0]):
                     if (s != e[1]):
                         self.orientation_graph.append((s,e[0]))
-                        
         #for non matched constraints
         for constraint in self.unmatched_constraints:
             for variable in self.D.successors(constraint):
@@ -194,15 +204,17 @@ class SATool:
         #plt.savefig("./images/" + self.G.name + ".png")
         if(with_matching ):
             ax1.set_title("Max Matching")
-            self.calculate_maximum_matching()
+            #self.calculate_maximum_matching()
+            self.calculate_matching_ranking_constraints()
             nx.draw_networkx_edges(self.G,pos,ax=ax1,
                                 edgelist=self.max_match_list,
                                 width=8,alpha=0.3,edge_color='b')
             #plt.savefig("./images/" + self.G.name+"_MaxMatching" + ".png")
         if(with_orientation):
             ax1.set_title("With Orientation")
-            self.calculate_maximum_matching()
-            self.calculate_maximum_matching()
+            #self.calculate_maximum_matching()
+            self.calculate_matching_ranking_constraints()
+            print pos
             nx.draw_networkx_edges(self.G,pos,ax=ax1,
                                 edgelist=self.max_match_list,
                                 width=5,alpha=0.3,edge_color='b')

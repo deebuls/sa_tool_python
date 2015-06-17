@@ -1,5 +1,15 @@
-from sa_tool import sa_tool
+import sys
+import os
 import networkx as nx
+
+topdir = os.path.normpath(os.path.join(os.path.abspath(sys.argv[0]),
+                                           os.pardir, os.pardir))
+if os.path.exists(os.path.join(topdir, "targetDir", "__init__.py")):
+        sys.path.insert(0, topdir)
+parentdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+os.sys.path.insert(0,parentdir) 
+
+import sa_tool
 
 if __name__ == '__main__' :
     B = nx.Graph()

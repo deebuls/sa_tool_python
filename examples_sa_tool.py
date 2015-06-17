@@ -56,7 +56,7 @@ if __name__ == '__main__' :
     sa1.calculate_maximum_matching()
     #sa1.visualize_bipartite(with_matching=True)
     sa1.calculate_orientation()
-    #sa1.visualize_bipartite(with_orientation=True)
+    sa1.visualize_bipartite(with_orientation=True)
     sa1.list_all_analytic_redundancy_relations()
 
 

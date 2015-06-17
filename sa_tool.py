@@ -234,6 +234,7 @@ class SATool:
         ## can be removed to just use  the D graph 
         ## need to modify the D graph with the orientation obtained
         self.D_with_orientation = nx.DiGraph(self.orientation_graph_edge_list)
+        print "Page Rank :", nx.hits_numpy(self.D_with_orientation)
 
 
     def visualize_bipartite(self, with_matching=False,with_orientation=False):

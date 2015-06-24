@@ -1,4 +1,3 @@
-# Embedded file name: /data/dataDeebul/3Sem_MAS/fdd/fault_structure_analysis_tool/networkx/sa_tool/sa_tool.py
 import networkx as nx
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
@@ -187,16 +186,16 @@ class SATool:
         print "Known Variables :",self.known
         print "Unmatched contratins :",self.unmatched_constraints
 
-        self.residuals = []
+        self.residuals = defaultdict(list)
 
-        for v in self.known:
-            for c in self.unmatched_constraints:
+        for c in self.unmatched_constraints:
+            for v in self.known:
                 paths =  nx.all_simple_paths(self.D, v, c )
                 for path in paths:
-                    self.residuals.append(list(path))
+                    self.residuals[c].append(list(path))
     
-        for path in self.residuals:
-            print "RESIDUAL PATH : ", path
+        for constraint, path in self.residuals.items():
+            print "CONSTRAINT : ",constraint," : RESIDUAL PATH : ",  path
 
     def list_all_detectable_constratints(self):
         '''
@@ -214,13 +213,14 @@ class SATool:
         '''
 
         self.detectable_constraints = []
-        for constraint in self.constraints:
-            for path in self.residuals:
-                if constraint in path:
-                    self.detectable_constraints.append(constraint)
-                    break;
+        for residual_constraint, paths in self.residuals.items():
+            for constraint in self.constraints:
+                for path in paths:
+                    if constraint in path:
+                        self.detectable_constraints.append(constraint)
+                        break;
+            print "For Residual Constraint :",residual_constraint," Detectable Constraints are : ", self.detectable_constraints
 
-        print "Detectable Constraints are : ", self.detectable_constraints
 
 
     def list_all_isolable_constratints(self):

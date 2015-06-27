@@ -1,4 +1,9 @@
-from sa_tool import sa_tool
+import sys
+import os.path
+sys.path.append(
+            os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir)))
+
+import sa_tool
 import networkx as nx
 
 if __name__ == '__main__' :
@@ -15,9 +20,6 @@ if __name__ == '__main__' :
     B.add_edges_from([('y','c5'),('y','c4')])
 
     sa1 = sa_tool.SATool(B)
-    #sa1.calculate_maximum_matching_max_flow_algorithm()
-    sa1.visualize_bipartite()
-    sa1.calculate_maximum_matching()
-    sa1.visualize_bipartite(with_matching=True)
     sa1.visualize_bipartite(with_orientation=True)
-    
+    sa1.list_all_analytic_redundancy_relations()
+    sa1.list_all_detectable_constratints()

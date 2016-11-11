@@ -81,3 +81,23 @@ installation]{http://networkx.github.io/documentation/development/install.html}
 [1] Denmark, K. (2006). Satool-a software tool for structural analysis of complex
 auomation systems.
 
+### Documentation link for BLANKE satool
+http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.199.6246&rep=rep1&type=pdf
+
+### color codings and their meanings
+structure graph:
+color     -->  meaning
+green     -->  unknown variables
+yellow    -->  constraints
+Navy blue -->  known variables
+Red       -->  Unmatched constraint
+
+Structure graph with maximal matching
+color     -->  meaning
+black     -->  Normal edge
+Sky Blue  -->  Matched edge
+
+Structure graph with maximal matching and orientation
+color     -->  meaning
+Multiple Thick Black lines --> Parity relation
+

@@ -2,7 +2,7 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import sys
-import pulp
+#import pulp
 import string
 
 from collections import defaultdict
@@ -56,10 +56,10 @@ class SATool:
         #Creating reduced graph by removing known variables
         self.R = self.G.copy()
         self.R.remove_nodes_from(self.known)
-
+        
         #Removing edges which cannot be matched
         #Example with derivative casuality
-        for x,y in  self.G.edges():
+        for x,y in  self.R.edges():
             if 'derivative_casuality' in self.G[x][y] :
                 self.R.remove_edge(x,y)
 

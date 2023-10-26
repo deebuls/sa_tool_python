@@ -15,7 +15,7 @@ class SATool:
 
     def __init__(self, graph):
         if (False == nx.is_bipartite(graph)):
-            print "[ERROR]Not a bipartite graph provided."
+            print ("[ERROR]Not a bipartite graph provided.")
             sys.exit()
 
         #Copying the graph provided by the user
@@ -29,7 +29,7 @@ class SATool:
 
         #Ensuring that the bipartite == 1 is assigned to varaibles
         Y = list(self.variables)
-        if (self.G.node[Y[0]]['bipartite'] == 1):
+        if (self.G.nodes[Y[0]]['bipartite'] == 1):
             X = self.constraints
             self.constraints = self.variables
             self.variables = X
@@ -39,18 +39,18 @@ class SATool:
             known = []
             unknown = []
             for n in self.variables:
-                if (self.G.node[n]['type'] == 'known'):
+                if (self.G.nodes[n]['type'] == 'known'):
                     known.append(n)
-                elif (self.G.node[n]['type'] == 'unknown'):
+                elif (self.G.nodes[n]['type'] == 'unknown'):
                     unknown.append(n)
                 else:
-                    print "[ERROR] Please specify for each node type as 'known' or 'unknown'"
+                    print ("[ERROR] Please specify for each node type as 'known' or 'unknown'")
                     sys.exit()
 
             self.known = set(known)
             self.unknown = set(unknown)
         except KeyError:
-                print "[ERROR] Please specify for each node type as 'known' or 'unknown'"
+                print ("[ERROR] Please specify for each node type as 'known' or 'unknown'")
                 sys.exit()
 
         #Creating reduced graph by removing known variables
@@ -120,16 +120,16 @@ class SATool:
 
         self.max_match_dict = dict(max_matching)
         self.max_match_list = max_matching
-        print "Max Matching : ",max_matching
+        print ("Max Matching : ",max_matching)
 
     def calculate_maximum_matching(self):
         try:
             self.max_match_dict = nx.algorithms.bipartite.maximum_matching(self.R)
             self.max_match_list = list(self.max_match_dict.items())
-            print self.max_match_list
+            print (self.max_match_list)
         except:
-            print "Networkx Development version required for calculationg maximum matching"
-            print "Please read Installation instructions "
+            print ("Networkx Development version required for calculationg maximum matching")
+            print ("Please read Installation instructions ")
             exit()
 
 
@@ -214,7 +214,7 @@ class SATool:
             ax1.set_title("With Orientation")
             #self.calculate_maximum_matching()
             self.calculate_matching_ranking_constraints()
-            print pos
+            print (pos)
             nx.draw_networkx_edges(self.G,pos,ax=ax1,
                                 edgelist=self.max_match_list,
                                 width=5,alpha=0.3,edge_color='b')
